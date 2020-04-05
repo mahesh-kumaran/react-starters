@@ -1,30 +1,43 @@
 import React, { Component } from "react";
 import { getMovies } from "../services/fakeMovieService";
-import LikeHeart from "./like";
+import LikeHeart from "./common/like";
+import Pagination from "./common/paginate";
+import paginate from "../utils/paginate";
 
 class MoviesList extends Component {
   state = {
-    movies: getMovies()
+    movies: getMovies(),
+    currentPage: 1,
+    pageCount: 4,
   };
 
-  handler = index => {
-    let updatedList = this.state.movies.filter(movie => {
+  handler = (index) => {
+    let updatedList = this.state.movies.filter((movie) => {
       return movie._id !== index;
     });
     this.setState({ movies: updatedList });
   };
 
-  handleLike = movie => {
+  handleLike = (movie) => {
     const movies = [...this.state.movies];
     const index = movies.indexOf(movie);
     movies[index].liked = !movies[index].liked;
     this.setState({ movies });
   };
 
-  render() {
-    console.log("Props", this.props);
+  handlePageChange = (pageNo) => {
+    this.setState({ currentPage: pageNo });
+  };
 
-    let { length: count } = this.state.movies;
+  render() {
+    const { length: count } = this.state.movies;
+
+    const { currentPage, pageCount, movies: totalMovies } = this.state;
+
+    const movies = paginate(totalMovies, pageCount, currentPage);
+
+    console.log(movies);
+
     if (count === 0) {
       return <h2> There are no movies in the database</h2>;
     }
@@ -32,10 +45,7 @@ class MoviesList extends Component {
     return (
       <div>
         <h1> Hey, Welcome to Show Man </h1>
-        <h4>
-          Available number of movies in our collection :{" "}
-          {this.state.movies.length}
-        </h4>
+        <h4>Available number of movies in our collection : {count}</h4>
         <table className="table">
           <thead>
             <tr>
@@ -46,7 +56,7 @@ class MoviesList extends Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.movies.map(movie => {
+            {movies.map((movie) => {
               return (
                 <tr key={movie._id}>
                   <td>{movie.title}</td>
@@ -76,6 +86,12 @@ class MoviesList extends Component {
             })}
           </tbody>
         </table>
+        <Pagination
+          itemsCount={count}
+          pageCount={pageCount}
+          currentPage={currentPage}
+          onPageChange={this.handlePageChange}
+        />
       </div>
     );
   }
