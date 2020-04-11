@@ -3,12 +3,16 @@ import { getMovies } from "../services/fakeMovieService";
 import LikeHeart from "./common/like";
 import Pagination from "./common/paginate";
 import paginate from "../utils/paginate";
+import ListGroup from "./common/listGroup";
+import { getGenres } from "../services/fakeGenreService";
 
 class MoviesList extends Component {
   state = {
     movies: getMovies(),
     currentPage: 1,
     pageCount: 4,
+    genres: getGenres(),
+    selectedGenre: "0",
   };
 
   handler = (index) => {
@@ -29,6 +33,14 @@ class MoviesList extends Component {
     this.setState({ currentPage: pageNo });
   };
 
+  handleGenreGroup = (genreId) => {
+    const allMovies = getMovies();
+    const movies = genreId
+      ? allMovies.filter((movie) => movie.genre._id == genreId)
+      : allMovies;
+    this.setState({ movies, currentPage: 1, selectedGenre: genreId });
+  };
+
   render() {
     const { length: count } = this.state.movies;
 
@@ -36,7 +48,7 @@ class MoviesList extends Component {
 
     const movies = paginate(totalMovies, pageCount, currentPage);
 
-    console.log(movies);
+    const genres = [{ name: "All Genres" }, ...this.state.genres];
 
     if (count === 0) {
       return <h2> There are no movies in the database</h2>;
@@ -46,6 +58,11 @@ class MoviesList extends Component {
       <div>
         <h1> Hey, Welcome to Show Man </h1>
         <h4>Available number of movies in our collection : {count}</h4>
+        <ListGroup
+          genres={genres}
+          onGroupList={this.handleGenreGroup}
+          selectedItem={this.state.selectedGenre}
+        />
         <table className="table">
           <thead>
             <tr>
