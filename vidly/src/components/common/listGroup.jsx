@@ -5,11 +5,15 @@ class ListGroup extends Component {
     const { genres } = this.props;
 
     return (
-      <ul className="list-group list-group-horizontal-lg">
+      <ul className="list-group list-group-md">
         {genres.map((genre) => {
           return (
             <li
-              className="list-group-item list-group-item-action"
+              className={
+                this.props.selectedItem === genre._id
+                  ? "list-group-item list-group-item-action active"
+                  : "list-group-item list-group-item-action"
+              }
               key={genre._id}
               onClick={() => this.props.onGroupList(genre._id)}
             >

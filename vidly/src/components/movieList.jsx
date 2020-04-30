@@ -5,6 +5,7 @@ import Pagination from "./common/paginate";
 import paginate from "../utils/paginate";
 import ListGroup from "./common/listGroup";
 import { getGenres } from "../services/fakeGenreService";
+import { Link } from "react-router-dom";
 
 class MoviesList extends Component {
   state = {
@@ -36,7 +37,7 @@ class MoviesList extends Component {
   handleGenreGroup = (genreId) => {
     const allMovies = getMovies();
     const movies = genreId
-      ? allMovies.filter((movie) => movie.genre._id == genreId)
+      ? allMovies.filter((movie) => movie.genre._id === genreId)
       : allMovies;
     this.setState({ movies, currentPage: 1, selectedGenre: genreId });
   };
@@ -57,58 +58,68 @@ class MoviesList extends Component {
     return (
       <div>
         <h1> Hey, Welcome to Show Man </h1>
+
         <h4>Available number of movies in our collection : {count}</h4>
-        <ListGroup
-          genres={genres}
-          onGroupList={this.handleGenreGroup}
-          selectedItem={this.state.selectedGenre}
-        />
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Genre</th>
-              <th>Stock</th>
-              <th>RentalRate</th>
-            </tr>
-          </thead>
-          <tbody>
-            {movies.map((movie) => {
-              return (
-                <tr key={movie._id}>
-                  <td>{movie.title}</td>
-                  <td>{movie.genre.name}</td>
-                  <td>{movie.numberInStock}</td>
-                  <td>{movie.dailyRentalRate}</td>
-                  <td>
-                    <LikeHeart
-                      movie={movie}
-                      onLikeToggle={() => {
-                        this.handleLike(movie);
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => {
-                        this.handler(movie._id);
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </td>
+
+        <div class="row">
+          <div class="col-3">
+            <ListGroup
+              genres={genres}
+              onGroupList={this.handleGenreGroup}
+              selectedItem={this.state.selectedGenre}
+            />
+          </div>
+          <div class="col-9">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Genre</th>
+                  <th>Stock</th>
+                  <th>RentalRate</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        <Pagination
-          itemsCount={count}
-          pageCount={pageCount}
-          currentPage={currentPage}
-          onPageChange={this.handlePageChange}
-        />
+              </thead>
+              <tbody>
+                {movies.map((movie) => {
+                  return (
+                    <tr key={movie._id}>
+                      <td>
+                        <Link to={`/movies/${movie._id}`}>{movie.title}</Link>
+                      </td>
+                      <td>{movie.genre.name}</td>
+                      <td>{movie.numberInStock}</td>
+                      <td>{movie.dailyRentalRate}</td>
+                      <td>
+                        <LikeHeart
+                          movie={movie}
+                          onLikeToggle={() => {
+                            this.handleLike(movie);
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => {
+                            this.handler(movie._id);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <Pagination
+              itemsCount={count}
+              pageCount={pageCount}
+              currentPage={currentPage}
+              onPageChange={this.handlePageChange}
+            />
+          </div>
+        </div>
       </div>
     );
   }
