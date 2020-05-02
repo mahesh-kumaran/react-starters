@@ -6,7 +6,7 @@ class NavBar extends Component {
   render() {
     return (
       <nav className="nav">
-        <Link className="nav-link disabled" to="/">
+        <Link className="nav-link" to="/">
           {" "}
           Show Man
         </Link>

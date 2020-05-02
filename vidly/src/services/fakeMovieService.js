@@ -1,4 +1,5 @@
 import * as genresAPI from "./fakeGenreService";
+import { ObjectID } from "bson";
 
 const movies = [
   {
@@ -92,13 +93,14 @@ export function getMovie(id) {
 
 export function saveMovie(movie) {
   let movieInDb = movies.find((m) => m._id === movie._id) || {};
-  movieInDb.name = movie.name;
-  movieInDb.genre = genresAPI.genres.find((g) => g._id === movie.genreId);
+  movieInDb.title = movie.title;
+  movieInDb.genre = genresAPI.genres.find((g) => g._id === movie.genre._id);
   movieInDb.numberInStock = movie.numberInStock;
   movieInDb.dailyRentalRate = movie.dailyRentalRate;
 
   if (!movieInDb._id) {
-    movieInDb._id = Date.now();
+    const id = new ObjectID();
+    movieInDb._id = id.toString();
     movies.push(movieInDb);
   }
 

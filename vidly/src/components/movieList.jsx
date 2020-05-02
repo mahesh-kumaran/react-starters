@@ -42,6 +42,22 @@ class MoviesList extends Component {
     this.setState({ movies, currentPage: 1, selectedGenre: genreId });
   };
 
+  handleSearch = ({ currentTarget: search }) => {
+    const { movies } = this.state;
+
+    let movieList = movies.filter((movie) => {
+      return movie.title
+        .toLocaleLowerCase()
+        .includes(search.value.toLocaleLowerCase());
+    });
+
+    if (search.value === "" ) {
+      movieList = getMovies();
+    }
+
+    this.setState({ movies: movieList });
+  };
+
   render() {
     const { length: count } = this.state.movies;
 
@@ -61,15 +77,32 @@ class MoviesList extends Component {
 
         <h4>Available number of movies in our collection : {count}</h4>
 
-        <div class="row">
-          <div class="col-3">
+        <div className="row">
+          <div className="col-3">
             <ListGroup
               genres={genres}
               onGroupList={this.handleGenreGroup}
               selectedItem={this.state.selectedGenre}
             />
           </div>
-          <div class="col-9">
+          <div className="col-9">
+            <Link to={{ pathname: "/movies/new", props: { ...this.state } }}>
+              <button className="btn btn-primary" style={{ margin: 20 }}>
+                {" "}
+                New Movie
+              </button>
+            </Link>
+            <form>
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="form-control"
+                  onChange={this.handleSearch}
+                />
+              </div>
+            </form>
+
             <table className="table">
               <thead>
                 <tr>
