@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { getGenres } from "../services/fakeGenreService";
-import { saveMovie, getMovie } from "../services/fakeMovieService";
+import { getGenres } from "../services/genreService";
+import { saveMovie, getMovie } from "../services/movieService";
 
 class MovieForm extends Component {
   state = {
@@ -45,14 +45,15 @@ class MovieForm extends Component {
     this.setState({ data });
   };
 
-  componentDidMount() {
-    const genres = getGenres();
+  async componentDidMount() {
+    const { data: genres } = await getGenres();
     this.setState({ genres });
 
     const movieId = this.props.match.params.movieId;
     if (movieId === "new") return;
 
-    const movie = getMovie(movieId);
+    const { data: movie } = await getMovie(movieId);
+
     if (!movie) return this.props.history.replace("/not-found");
 
     this.setState({ data: this.maptoViewModal(movie) });

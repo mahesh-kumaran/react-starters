@@ -8,11 +8,14 @@ import NotFound from "./components/notFound";
 import NavBar from "./components/common/navBar";
 import MovieForm from "./components/movieForm";
 import LoginForm from "./components/loginForm";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <BrowserRouter>
       <React.Fragment>
+        <ToastContainer />
         <NavBar></NavBar>
         <Switch>
           <Route path="/movies/:movieId" component={MovieForm} />

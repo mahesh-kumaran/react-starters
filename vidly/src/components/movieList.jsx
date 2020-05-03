@@ -1,26 +1,43 @@
 import React, { Component } from "react";
-import { getMovies } from "../services/fakeMovieService";
+import { getMovies, deleteMovie } from "../services/movieService";
 import LikeHeart from "./common/like";
 import Pagination from "./common/paginate";
 import paginate from "../utils/paginate";
 import ListGroup from "./common/listGroup";
-import { getGenres } from "../services/fakeGenreService";
+import { getGenres } from "../services/genreService";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 class MoviesList extends Component {
   state = {
-    movies: getMovies(),
+    movies: [],
+    genres: [],
     currentPage: 1,
     pageCount: 4,
-    genres: getGenres(),
     selectedGenre: "0",
   };
 
-  handler = (index) => {
-    let updatedList = this.state.movies.filter((movie) => {
-      return movie._id !== index;
-    });
+  async componentDidMount() {
+    const { data: moviesList } = await getMovies();
+    this.setState({ movies: moviesList });
+
+    const { data: genresList } = await getGenres();
+    this.setState({ genres: genresList });
+  }
+
+  handleDelete = async (index) => {
+    console.log("Handle Delete", index);
+    const originalMovies = this.state.movies;
+    const updatedList = this.state.movies.filter((m) => m._id !== index);
     this.setState({ movies: updatedList });
+
+    try {
+      await deleteMovie(index);
+    } catch (error) {
+      if (error.response && error.response.status === 404)
+        toast.error("No such Movie exists in records!");
+      this.setState({ movies: originalMovies });
+    }
   };
 
   handleLike = (movie) => {
@@ -34,15 +51,15 @@ class MoviesList extends Component {
     this.setState({ currentPage: pageNo });
   };
 
-  handleGenreGroup = (genreId) => {
-    const allMovies = getMovies();
+  handleGenreGroup = async (genreId) => {
+    const { data: allMovies } = await getMovies();
     const movies = genreId
       ? allMovies.filter((movie) => movie.genre._id === genreId)
       : allMovies;
     this.setState({ movies, currentPage: 1, selectedGenre: genreId });
   };
 
-  handleSearch = ({ currentTarget: search }) => {
+  handleSearch = async ({ currentTarget: search }) => {
     const { movies } = this.state;
 
     let movieList = movies.filter((movie) => {
@@ -51,11 +68,12 @@ class MoviesList extends Component {
         .includes(search.value.toLocaleLowerCase());
     });
 
-    if (search.value === "" ) {
-      movieList = getMovies();
+    if (search.value === "") {
+      let { data: movieList } = await getMovies();
+      this.setState({ movies: movieList });
+    } else {
+      this.setState({ movies: movieList });
     }
-
-    this.setState({ movies: movieList });
   };
 
   render() {
@@ -134,7 +152,7 @@ class MoviesList extends Component {
                         <button
                           className="btn btn-danger"
                           onClick={() => {
-                            this.handler(movie._id);
+                            this.handleDelete(movie._id);
                           }}
                         >
                           Delete
