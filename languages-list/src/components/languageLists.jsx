@@ -10,13 +10,14 @@ import SearchBar from "./common/searchBar";
 class LanguageList extends Component {
   state = {
     lang: [],
+    originalLanguages: [],
     pageCount: 4,
     currentPage: 1,
   };
 
   async componentDidMount() {
     const { data: languages } = await fetchLanguages();
-    this.setState({ lang: languages });
+    this.setState({ originalLanguages: languages, lang: languages });
   }
 
   handlePageChange = (pageIndex) => {
@@ -24,23 +25,22 @@ class LanguageList extends Component {
   };
 
   handleSearch = async ({ currentTarget: search }) => {
-    console.log(search.value);
+    const { originalLanguages } = this.state;
 
-    const { lang } = this.state;
-
-    let languageList = lang.filter((lang) => {
+    let languageList = originalLanguages.filter((lang) => {
       return lang.language
         .toLocaleLowerCase()
         .includes(search.value.toLocaleLowerCase());
     });
 
     if (search.value === "") {
-      let { data: lang } = await fetchLanguages();
-      this.setState({ lang });
+      let { originalLanguages } = this.state;
+      this.setState({ lang: originalLanguages });
     } else {
       this.setState({ lang: languageList });
     }
   };
+
   render() {
     const { length: count } = this.state.lang;
     const { lang, pageCount, currentPage } = this.state;
